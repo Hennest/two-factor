@@ -1,0 +1,61 @@
+{
+    "name": "hennest/two-factor",
+    "description": "Two factor authentication provider for laravel apps.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "role": "Developer",
+            "name": "hennest",
+            "email": "ernestuwadiegwu@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Hennest\\TwoFactor\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hennest\\TwoFactor\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "pragmarx/google2fa-laravel": "^2.2"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.17",
+        "orchestra/testbench": "^9.2",
+        "pestphp/pest": "^2.34",
+        "phpstan/phpstan": "^1.11"
+    },
+    "scripts": {
+        "stan": [
+            "./vendor/bin/phpstan analyse"
+        ],
+        "pest": [
+            "./vendor/bin/pest"
+        ],
+        "pint": [
+            "./vendor/bin/pint"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hennest\\TwoFactor\\Providers\\TwoFactorServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
