@@ -13,8 +13,6 @@ test('users are redirected to two factor authentication challenge when two facto
         ->withTwoFactorConfirmedAt()
         ->create();
 
-    app('config')->set('auth.providers.users.model', User::class);
-
     $response = post(route('login'), [
         'email' => $user->email,
         'password' => 'password',
@@ -27,8 +25,6 @@ test('users are redirected to two factor authentication challenge when two facto
 
 test('user is not redirected to two factor authentication challenge if two factor authentication is not enabled', function (): void {
     $user = User::factory()->create();
-
-    app('config')->set('auth.providers.users.model', User::class);
 
     $response = from(route('login'))->post(route('login'), [
         'email' => $user->email,
@@ -46,8 +42,6 @@ test('authentication fails when credentials is invalid and two factor authentica
         ->withTwoFactorConfirmedAt()
         ->create();
 
-    app('config')->set('auth.providers.users.model', User::class);
-
     $response = from(route('login'))->post(route('login'), [
         'email' => $user->email,
         'password' => 'wrong-password',
@@ -63,8 +57,6 @@ test('two factor can preserve remember me selection', function (): void {
         ->withTwoFactorSecret()
         ->withTwoFactorConfirmedAt()
         ->create();
-
-    app('config')->set('auth.providers.users.model', User::class);
 
     $response = from(route('login'))->post(route('login'), [
         'email' => $user->email,

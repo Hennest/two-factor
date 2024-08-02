@@ -60,7 +60,9 @@ final readonly class TwoFactor implements TwoFactorInterface
         $timestamp = $this->engine->verifyKey(
             secret: $secret,
             key: $oneTimeCode,
-            oldTimestamp: $oldTimeStamp ?? $this->cache->get('2fa_codes.' . md5($oneTimeCode))
+            oldTimestamp: $oldTimeStamp ?? $this->cache->get(
+                key: 'two-factor::' . md5($oneTimeCode)
+            )
         );
 
         if ( ! $timestamp) {
@@ -68,7 +70,7 @@ final readonly class TwoFactor implements TwoFactorInterface
         }
 
         $this->cache->put(
-            key: '2fa_codes.' . md5($oneTimeCode),
+            key: 'two-factor::' . md5($oneTimeCode),
             value: $this->engine->getTimestamp(),
             ttl: ($this->engine->getWindow() ?: 1) * 60
         );

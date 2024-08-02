@@ -6,8 +6,7 @@ namespace Hennest\TwoFactor\Http\Middleware;
 
 use Closure;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
-use Hennest\TwoFactor\Traits\HasTwoFactorAuthentication;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -16,7 +15,6 @@ final class RedirectIfTwoFactorAuthenticatable
 {
     public function handle(Request $request, Closure $next): mixed
     {
-        /** @var Authenticatable&HasTwoFactorAuthentication $user */
         $user = $this->user()::query()
             ->where('email', $request->string('email')->value())
             ->first();
@@ -42,7 +40,7 @@ final class RedirectIfTwoFactorAuthenticatable
         return $next($request);
     }
 
-    private function user(): TwoFactorAuthenticatable
+    private function user(): Model
     {
         return app(config('two-factor.auth.model'));
     }

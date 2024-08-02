@@ -7,9 +7,9 @@ namespace Hennest\TwoFactor\Http\Controllers;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
 use Hennest\TwoFactor\Http\Requests\EnableRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
@@ -41,7 +41,8 @@ final readonly class ActivationController
     public function store(EnableRequest $request): RedirectResponse
     {
         $this->twoFactorService->enableTwoFactor(
-            user: $request->user()
+            user: $request->user(),
+            force: $request->payload()->force
         );
 
         return redirect()

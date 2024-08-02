@@ -7,11 +7,11 @@ namespace Hennest\TwoFactor\Http\Controllers;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
 use Hennest\TwoFactor\Http\Requests\ConfirmationRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
@@ -37,9 +37,12 @@ final readonly class ConfirmationController
             return redirect()->route('two-factor::activation.show');
         }
 
+        /** @var string $qrCode */
+        $qrCode = $user->twoFactorQrCode();
+
         return view('two-factor::confirmation.create', [
             'secretKey' => $user->twoFactorSecret(),
-            'qrCode' => new HtmlString($user->twoFactorQrCode()),
+            'qrCode' => new HtmlString($qrCode),
         ]);
     }
 

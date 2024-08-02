@@ -51,7 +51,7 @@ trait HasTwoFactorAuthentication
     /**
      * @throws RandomException
      */
-    public function replaceRecoveryCode(string $code): void
+    public function replaceRecoveryCode(string|null $code): void
     {
         if (null === $this->twoFactorRecoveryCodes()) {
             return;

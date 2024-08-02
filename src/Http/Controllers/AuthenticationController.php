@@ -7,19 +7,16 @@ namespace Hennest\TwoFactor\Http\Controllers;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
 use Hennest\TwoFactor\Http\Requests\LoginRequest;
-use Hennest\TwoFactor\Traits\HasTwoFactorAuthentication;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Foundation\Auth\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use Psr\SimpleCache\InvalidArgumentException;
-use Random\RandomException;
 
 final readonly class AuthenticationController
 {
@@ -30,7 +27,7 @@ final readonly class AuthenticationController
 
     public function create(Request $request): View|RedirectResponse
     {
-        $user = User::query()->find(
+        $user = $this->user()::query()->find(
             id: $request->session()->get('2fa:user:id')
         );
 
@@ -45,15 +42,13 @@ final readonly class AuthenticationController
      * @throws IncompatibleWithGoogleAuthenticatorException
      * @throws SecretKeyTooShortException
      * @throws InvalidCharactersException
-     * @throws RandomException
      * @throws InvalidArgumentException
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        /** @var Authenticatable&HasTwoFactorAuthentication $user */
         $user = $this->user()::query()->find($request->payload()->userId);
 
-        if ( ! $user instanceof TwoFactorAuthenticatable && ! $user->hasEnabledTwoFactorAuthentication()) {
+        if ( ! $user instanceof TwoFactorAuthenticatable || ! $user->hasEnabledTwoFactorAuthentication()) {
             return redirect()->route('login');
         }
 
@@ -65,7 +60,7 @@ final readonly class AuthenticationController
             ]);
         }
 
-        Auth::guard(config('auth.defaults.guard'))->login(
+        Auth::guard(config('two-factor.auth.guard'))->login(
             user: $user,
             remember: $request->payload()->remember
         );
@@ -76,7 +71,7 @@ final readonly class AuthenticationController
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
-    private function user(): TwoFactorAuthenticatable
+    private function user(): Model
     {
         return app(config('two-factor.auth.model'));
     }

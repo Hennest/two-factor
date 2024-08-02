@@ -16,7 +16,7 @@ interface TwoFactorAuthenticatable
 
     public function twoFactorRecoveryCodes(): string|null;
 
-    public function replaceRecoveryCode(string $code): void;
+    public function replaceRecoveryCode(string|null $code): void;
 
     public function twoFactorQrCode(): string|null;
 

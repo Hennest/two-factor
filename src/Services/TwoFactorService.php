@@ -8,7 +8,7 @@ use Hennest\TwoFactor\Contracts\RecoveryCodeInterface;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Hennest\TwoFactor\Contracts\TwoFactorInterface;
 use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
-use Hennest\TwoFactor\Traits\HasTwoFactorAuthentication;
+use Illuminate\Database\Eloquent\Model;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
@@ -24,10 +24,11 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
     }
 
     /**
+     * @param TwoFactorAuthenticatable&Model $user
      * @throws IncompatibleWithGoogleAuthenticatorException
-     * @throws SecretKeyTooShortException
      * @throws InvalidCharactersException
      * @throws RandomException
+     * @throws SecretKeyTooShortException
      */
     public function enableTwoFactor(TwoFactorAuthenticatable $user, bool $force = false): void
     {
@@ -41,6 +42,9 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
         ])->save();
     }
 
+    /**
+     * @param TwoFactorAuthenticatable&Model $user
+     */
     public function disableTwoFactor(TwoFactorAuthenticatable $user): void
     {
         if ( ! $user->hasEnabledTwoFactorAuthentication()) {
@@ -55,6 +59,7 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
     }
 
     /**
+     * @param TwoFactorAuthenticatable&Model $user
      * @throws IncompatibleWithGoogleAuthenticatorException
      * @throws InvalidCharactersException
      * @throws InvalidArgumentException
@@ -62,8 +67,7 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
      */
     public function confirmTwoFactor(TwoFactorAuthenticatable $user, string $code): bool
     {
-        /** @var HasTwoFactorAuthentication $user */
-        if ( ! $user->two_factor_secret) {
+        if ( ! $user->twoFactorSecret()) {
             return false;
         }
 
@@ -84,6 +88,10 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
      */
     public function validateSecretKey(TwoFactorAuthenticatable $user, string $twoFactorCode): bool
     {
+        if ( ! $user->twoFactorSecret()) {
+            return false;
+        }
+
         return $this->twoFactor->verify(
             secret: $user->twoFactorSecret(),
             oneTimeCode: $twoFactorCode
@@ -92,7 +100,7 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
 
     public function validateRecoveryCode(TwoFactorAuthenticatable $user, string|null $recoveryCode = null): false|string
     {
-        if ( ! $recoveryCode && ! $user->twoFactorRecoveryCodes()) {
+        if ( ! $recoveryCode || ! $user->twoFactorRecoveryCodes()) {
             return false;
         }
 

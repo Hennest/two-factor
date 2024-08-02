@@ -21,7 +21,9 @@ test('two factor login page is rendered', function (): void {
 
     assertGuest();
 
-    $response->assertRedirect();
+    $response
+        ->assertSuccessful()
+        ->assertViewIs('two-factor::authentication.login');
 });
 
 test('two factor login page is not rendered if session does not have valid key', function (): void {
@@ -29,7 +31,7 @@ test('two factor login page is not rendered if session does not have valid key',
         route('two-factor::authentication.create')
     );
 
-    expect(Session::get('2fa:user:id'))->toBeNull();
+    $response->assertSessionMissing('2fa:user:id');
 
     assertGuest();
 
@@ -44,6 +46,7 @@ test('users can authenticate using the correct two factor authentication code', 
 
     $user = User::factory()
         ->withTwoFactorSecret($twoFactorSecret)
+        ->withTwoFactorConfirmedAt()
         ->withTwoFactorRecoveryCodes()
         ->create();
 
@@ -57,14 +60,18 @@ test('users can authenticate using the correct two factor authentication code', 
 
     assertAuthenticated();
 
-    expect(Session::get('2fa:user:id'))->toBeNull();
-
-    $response->assertRedirect(route('dashboard'));
+    $response
+        ->assertSessionMissing([
+            '2fa:user:id',
+            '2fa:auth:remember',
+        ])
+        ->assertRedirect(route('dashboard'));
 });
 
 test('users cannot authenticate using wrong two factor authentication code', function (): void {
     $user = User::factory()
         ->withTwoFactorSecret('JBSWY3DPEHPK3PXP')
+        ->withTwoFactorConfirmedAt()
         ->create();
 
     Session::put('2fa:user:id', $user->id);
@@ -74,6 +81,8 @@ test('users cannot authenticate using wrong two factor authentication code', fun
     ]));
 
     $response->assertSessionHasErrors(['code']);
+
+    assertGuest();
 
     $response->assertRedirect(route('login'));
 });
@@ -97,6 +106,8 @@ test('two factor authentication fails for old otp', function (): void {
     $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store', [
         'code' => $previousOtp,
     ]));
+
+    assertGuest();
 
     $response
         ->assertSessionHasErrors(['code'])
@@ -125,6 +136,8 @@ test('two factor authentication fails for old otp regardless of what is set for 
         'code' => $previousOtp,
     ]));
 
+    assertGuest();
+
     $response
         ->assertSessionHasErrors(['code'])
         ->assertSessionHas('2fa:user:id', $user->id)
@@ -151,6 +164,8 @@ test('two factor authentication fails for zero window', function (): void {
         'code' => $previousOtp,
     ]));
 
+    assertGuest();
+
     $response
         ->assertSessionHasErrors(['code'])
         ->assertSessionHas('2fa:user:id', $user->id)
@@ -170,7 +185,67 @@ test('ensure two factor authentication attempts are throttled', function (): voi
         ]);
     }
 
+    assertGuest();
+
     $response
         ->assertTooManyRequests()
         ->assertSessionHas('2fa:user:id', $user->id);
+});
+
+test('users are redirected to login if two factor authentication is disabled', function (): void {
+    $user = User::factory()->create();
+
+    Session::put('2fa:user:id', $user->id);
+
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
+        'code' => '123456',
+    ]));
+
+    assertGuest();
+
+    $response->assertRedirect(route('login'));
+});
+
+test('users can authenticate using one of the correct two factor recovery code', function (): void {
+    $user = User::factory()
+        ->withTwoFactorSecret('JBSWY3DPEHPK3PXP')
+        ->withTwoFactorConfirmedAt()
+        ->withTwoFactorRecoveryCodes()
+        ->create();
+
+    Session::put('2fa:user:id', $user->id);
+
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
+        'recovery_code' => 'one',
+    ]));
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertSessionMissing('2fa:user:id');
+
+    assertAuthenticated();
+
+    $response->assertRedirect(route('dashboard'));
+});
+
+test('users can not authenticate using the wrong two factor recovery code', function (): void {
+    $user = User::factory()
+        ->withTwoFactorSecret('JBSWY3DPEHPK3PXP')
+        ->withTwoFactorConfirmedAt()
+        ->withTwoFactorRecoveryCodes()
+        ->create();
+
+    Session::put('2fa:user:id', $user->id);
+
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
+        'recovery_code' => 'wrong-recovery-code',
+    ]));
+
+    $response
+        ->assertSessionHasErrors(['code'])
+        ->assertSessionHas('2fa:user:id');
+
+    assertGuest();
+
+    $response->assertRedirect(route('login'));
 });
