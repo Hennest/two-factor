@@ -23,9 +23,14 @@ return [
      */
     'auth' => [
         /**
+         * Two-factor authentication model.
+         */
+        'model' => App\Models\User::class,
+        /**
          * Two-factor authentication window.
          */
         //        'window' => 0,
+
         /**
          * Old OTP is forbidden when set to true regardless of the window.
          */

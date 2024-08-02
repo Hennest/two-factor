@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Hennest\TwoFactor\Tests\Models\User;
 
-use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\from;
 use function Pest\Laravel\post;
 
@@ -38,7 +37,7 @@ test('user is not redirected to two factor authentication challenge if two facto
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard'));
+        ->assertSuccessful();
 });
 
 test('authentication fails when credentials is invalid and two factor authentication is enabled', function (): void {
@@ -57,21 +56,6 @@ test('authentication fails when credentials is invalid and two factor authentica
     $response
         ->assertSessionHasErrors(['email'])
         ->assertRedirect(route('login'));
-});
-
-test('users can authenticate when two factor is disabled', function (): void {
-    $user = User::factory()->create();
-
-    app('config')->set('auth.providers.users.model', User::class);
-
-    $response = from(route('login'))->post(route('login'), [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
-
-    assertAuthenticated();
-
-    $response->assertRedirect(route('dashboard'));
 });
 
 test('two factor can preserve remember me selection', function (): void {

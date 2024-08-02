@@ -51,7 +51,7 @@ final readonly class AuthenticationController
     public function store(LoginRequest $request): RedirectResponse
     {
         /** @var Authenticatable&HasTwoFactorAuthentication $user */
-        $user = User::query()->find($request->payload()->userId);
+        $user = $this->user()::query()->find($request->payload()->userId);
 
         if ( ! $user instanceof TwoFactorAuthenticatable && ! $user->hasEnabledTwoFactorAuthentication()) {
             return redirect()->route('login');
@@ -74,5 +74,10 @@ final readonly class AuthenticationController
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    private function user(): TwoFactorAuthenticatable
+    {
+        return app(config('two-factor.auth.model'));
     }
 }

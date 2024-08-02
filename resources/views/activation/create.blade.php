@@ -8,14 +8,14 @@
             <p>
                 {{ __('Enable two factor authentication for you account.') }}
             </p>
-            <x-session-status :status="session('status')" />
+            <x-two-factor::session-status :status="session('status')" />
 
             <form method="POST" action="{{ route('two-factor-activation::store') }}">
                 @csrf
 
                 <div class="form-group row">
                     <div class="col-md-6">
-                        <x-input-error :messages="$errors->get('code')" />
+                        <x-two-factor::input-error :messages="$errors->get('code')" />
                     </div>
                 </div>
 

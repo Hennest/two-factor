@@ -7,9 +7,9 @@ namespace Hennest\TwoFactor\Traits;
 use Hennest\QrCode\Configuration\Dimension;
 use Hennest\QrCode\Exceptions\InvalidMarginException;
 use Hennest\QrCode\Exceptions\InvalidSizeException;
-use Hennest\QrCode\Services\QRCodeInterface;
-use Hennest\TwoFactor\Services\RecoveryCode;
-use Hennest\TwoFactor\Services\TwoFactor;
+use Hennest\QRCode\Services\QRCodeInterface;
+use Hennest\TwoFactor\Contracts\RecoveryCodeInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Random\RandomException;
@@ -60,7 +60,7 @@ trait HasTwoFactorAuthentication
         $this->forceFill([
             'two_factor_recovery_codes' => encrypt(str_replace(
                 search: $code,
-                replace: app(RecoveryCode::class)->generate(),
+                replace: app(RecoveryCodeInterface::class)->generate(),
                 subject: $this->twoFactorRecoveryCodes()
             )),
         ])->save();
@@ -90,7 +90,7 @@ trait HasTwoFactorAuthentication
             return null;
         }
 
-        return app(TwoFactor::class)->qrCodeUrl(
+        return app(TwoFactorInterface::class)->qrCodeUrl(
             companyName: parse_url(config('app.url'), PHP_URL_HOST),
             companyEmail: $this->getAuthIdentifierUsername(),
             secret: $this->twoFactorSecret()

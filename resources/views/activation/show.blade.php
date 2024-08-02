@@ -26,7 +26,7 @@
                                autofocus
                                autocomplete="new-password"
                         >
-                        <x-input-error :messages="$errors->twoFactorDeletion->get('password')" />
+                        <x-two-factor::input-error :messages="$errors->twoFactorDeletion->get('password')" />
                     </div>
                 </div>
 

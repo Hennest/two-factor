@@ -24,7 +24,7 @@
                                name="code"
                                required
                                autofocus>
-                        <x-input-error :messages="$errors->get('code')" />
+                        <x-two-factor::input-error :messages="$errors->get('code')" />
                     </div>
                 </div>
 

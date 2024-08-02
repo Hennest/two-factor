@@ -32,7 +32,7 @@
                                required
                                autofocus>
 
-                        <x-input-error :messages="$errors->confirmTwoFactorAuthentication->get('code')" />
+                        <x-two-factor::input-error :messages="$errors->confirmTwoFactorAuthentication->get('code')" />
                     </div>
                 </div>
 

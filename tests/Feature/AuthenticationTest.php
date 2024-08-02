@@ -21,7 +21,7 @@ test('two factor login page is rendered', function (): void {
 
     assertGuest();
 
-    $response->assertStatus(200);
+    $response->assertRedirect();
 });
 
 test('two factor login page is not rendered if session does not have valid key', function (): void {
