@@ -10,7 +10,7 @@ test('two factor activation can be rendered', function (): void {
     $user = User::factory()->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-activation::create')
+        route('two-factor::activation.create')
     );
 
     $response
@@ -24,21 +24,21 @@ test('users are redirected to two factor confirmation page if secret key is not 
         ->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-activation::create')
+        route('two-factor::activation.create')
     );
 
-    $response->assertRedirect(route('two-factor-confirmation::create'));
+    $response->assertRedirect(route('two-factor::confirmation.create'));
 });
 
 test('users can enable two factor authentication', function (): void {
     $user = User::factory()->create();
 
     $response = actingAs($user)->post(
-        route('two-factor-activation::store')
+        route('two-factor::activation.store')
     );
 
     $response
-        ->assertRedirect(route('two-factor-confirmation::create'))
+        ->assertRedirect(route('two-factor::confirmation.create'))
         ->assertSessionHasNoErrors();
 
     $user = $user->fresh();
@@ -59,12 +59,12 @@ test('users can enable two factor authentication when force is false', function 
 
     $response = actingAs($user)
         ->from(route('dashboard'))
-        ->post(route('two-factor-activation::store'), [
+        ->post(route('two-factor::activation.store'), [
             'force' => false,
         ]);
 
     $response
-        ->assertRedirect(route('two-factor-confirmation::create'))
+        ->assertRedirect(route('two-factor::confirmation.create'))
         ->assertSessionHasNoErrors();
 
     $oldSecret = $user->two_factor_secret;
@@ -88,12 +88,12 @@ test('two factor authentication can be force enabled', function (): void {
 
     $oldSecret = $user->two_factor_secret;
 
-    $response = actingAs($user)->post(route('two-factor-activation::store'), [
+    $response = actingAs($user)->post(route('two-factor::activation.store'), [
         'force' => true,
     ]);
 
     $response
-        ->assertRedirect(route('two-factor-confirmation::create'))
+        ->assertRedirect(route('two-factor::confirmation.create'))
         ->assertSessionHasNoErrors();
 
     $user = $user->fresh();
@@ -117,7 +117,7 @@ test('two factor confirmation can be rendered', function (): void {
         ->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-confirmation::create')
+        route('two-factor::confirmation.create')
     );
 
     $response
@@ -133,10 +133,10 @@ test('users are redirected to two factor activation create page if secret key is
     $user = User::factory()->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-confirmation::create')
+        route('two-factor::confirmation.create')
     );
 
-    $response->assertRedirect(route('two-factor-activation::create'));
+    $response->assertRedirect(route('two-factor::activation.create'));
 });
 
 test('users are redirected to two factor activation show page if two factor authentication is not enabled', function (): void {
@@ -146,10 +146,10 @@ test('users are redirected to two factor activation show page if two factor auth
         ->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-confirmation::create')
+        route('two-factor::confirmation.create')
     );
 
-    $response->assertRedirect(route('two-factor-activation::show'));
+    $response->assertRedirect(route('two-factor::activation.show'));
 });
 
 test('users can confirm two factor authentication', function (): void {
@@ -162,13 +162,13 @@ test('users can confirm two factor authentication', function (): void {
         ->create();
 
     $response = actingAs($user)
-        ->from(route('two-factor-confirmation::create'))
-        ->post(route('two-factor-confirmation::store'), [
+        ->from(route('two-factor::confirmation.create'))
+        ->post(route('two-factor::confirmation.store'), [
             'code' => $validOtp,
         ]);
 
     $response
-        ->assertRedirect(route('two-factor-activation::show'))
+        ->assertRedirect(route('two-factor::activation.show'))
         ->assertSessionHasNoErrors()
         ->assertSessionHas('status', 'Two-factor authentication is enabled.');
 });
@@ -179,13 +179,13 @@ test('users cannot confirm two factor authentication with invalid code', functio
         ->create();
 
     $response = actingAs($user)
-        ->from(route('two-factor-confirmation::create'))
-        ->post(route('two-factor-confirmation::store'), [
+        ->from(route('two-factor::confirmation.create'))
+        ->post(route('two-factor::confirmation.store'), [
             'code' => 'invalid-otp',
         ]);
 
     $response
-        ->assertRedirect(route('two-factor-confirmation::create'))
+        ->assertRedirect(route('two-factor::confirmation.create'))
         ->assertSessionHasErrors('code', errorBag: 'confirmTwoFactorAuthentication');
 });
 
@@ -196,7 +196,7 @@ test('two factor activation show page can be rendered', function (): void {
         ->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-activation::show')
+        route('two-factor::activation.show')
     );
 
     $response
@@ -208,10 +208,10 @@ test('two factor activation show page will not be rendered if two factor authent
     $user = User::factory()->create();
 
     $response = actingAs($user)->get(
-        route('two-factor-activation::show')
+        route('two-factor::activation.show')
     );
 
-    $response->assertRedirect(route('two-factor-confirmation::create'));
+    $response->assertRedirect(route('two-factor::confirmation.create'));
 });
 
 test('users can disable two factor authentication with correct password', function (): void {
@@ -221,13 +221,13 @@ test('users can disable two factor authentication with correct password', functi
         ->withTwoFactorConfirmedAt()
         ->create();
 
-    $response = actingAs($user)->delete(route('two-factor-activation::destroy'), [
+    $response = actingAs($user)->delete(route('two-factor::activation.destroy'), [
         'password' => 'password',
     ]);
 
 
     $response
-        ->assertRedirect(route('two-factor-activation::create'))
+        ->assertRedirect(route('two-factor::activation.create'))
         ->assertSessionHasNoErrors();
 
     $user = $user->fresh();
@@ -253,12 +253,12 @@ test('users cannot disable two factor authentication with wrong password', funct
         ->create();
 
     $response = actingAs($user)
-        ->from(route('two-factor-activation::create'))
-        ->delete(route('two-factor-activation::destroy'), [
+        ->from(route('two-factor::activation.create'))
+        ->delete(route('two-factor::activation.destroy'), [
             'password' => 'wrong-password',
         ]);
 
-    $response->assertRedirect(route('two-factor-activation::create'));
+    $response->assertRedirect(route('two-factor::activation.create'));
 
     $user = $user->fresh();
 

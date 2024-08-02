@@ -22,7 +22,7 @@ test('users are redirected to two factor authentication challenge when two facto
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('two-factor-authentication::create'));
+        ->assertRedirect(route('two-factor::authentication.create'));
 });
 
 test('user is not redirected to two factor authentication challenge if two factor authentication is not enabled', function (): void {
@@ -74,5 +74,5 @@ test('two factor can preserve remember me selection', function (): void {
 
     $response
         ->assertSessionHas('2fa:user:remember', true)
-        ->assertRedirect(route('two-factor-authentication::create'));
+        ->assertRedirect(route('two-factor::authentication.create'));
 });

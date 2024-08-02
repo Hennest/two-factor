@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Route;
  */
 $twoFactor = config('two-factor');
 
-// TODO: Refactor route name to be two-factor::authentications.create
 Route::middleware([
     'web',
     sprintf(
@@ -29,7 +28,7 @@ Route::middleware([
         $twoFactor['guest']['guard'] ?? 'web'
     ),
 ])->group(function () use ($twoFactor): void {
-    Route::get('two-factor/auth', [AuthenticationController::class, 'create'])->name('two-factor-authentication::create');
+    Route::get('two-factor/auth', [AuthenticationController::class, 'create'])->name('two-factor::authentication.create');
 
     /** @var array{
      *      auth: array{
@@ -48,7 +47,7 @@ Route::middleware([
                 $twoFactor['auth']['throttle']['decay'] ?? 1
             ),
         ])
-        ->name('two-factor-authentication::store');
+        ->name('two-factor::authentication.store');
 });
 
 Route::middleware([
@@ -59,11 +58,11 @@ Route::middleware([
         $twoFactor['auth']['guard'] ?? 'web'
     ),
 ])->group(function (): void {
-    Route::get('/two-factor/create', [ActivationController::class, 'create'])->name('two-factor-activation::create');
-    Route::get('/two-factor/show', [ActivationController::class, 'show'])->name('two-factor-activation::show');
-    Route::post('two-factor', [ActivationController::class, 'store'])->name('two-factor-activation::store');
-    Route::delete('two-factor', [ActivationController::class, 'destroy'])->name('two-factor-activation::destroy');
+    Route::get('/two-factor/create', [ActivationController::class, 'create'])->name('two-factor::activation.create');
+    Route::get('/two-factor/show', [ActivationController::class, 'show'])->name('two-factor::activation.show');
+    Route::post('two-factor', [ActivationController::class, 'store'])->name('two-factor::activation.store');
+    Route::delete('two-factor', [ActivationController::class, 'destroy'])->name('two-factor::activation.destroy');
 
-    Route::get('two-factor/confirm/create', [ConfirmationController::class, 'create'])->name('two-factor-confirmation::create');
-    Route::post('two-factor/confirm', [ConfirmationController::class, 'store'])->name('two-factor-confirmation::store');
+    Route::get('two-factor/confirm/create', [ConfirmationController::class, 'create'])->name('two-factor::confirmation.create');
+    Route::post('two-factor/confirm', [ConfirmationController::class, 'store'])->name('two-factor::confirmation.store');
 });

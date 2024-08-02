@@ -8,7 +8,7 @@
             <p>
                 {{ __('2FA is currently enabled on your account.') }}
             </p>
-            <form method="POST" action="{{ route('two-factor-activation::destroy') }}">
+            <form method="POST" action="{{ route('two-factor::activation.destroy') }}">
                 @csrf
                 @method('DELETE')
 

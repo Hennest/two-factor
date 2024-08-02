@@ -9,7 +9,7 @@
                 {{ __('Please enter your one-time password to complete your login.') }}
             </p>
 
-            <form method="POST" action="{{ route('two-factor-authentication::store') }}">
+            <form method="POST" action="{{ route('two-factor::authentication.store') }}">
                 @csrf
 
                 <div class="form-group row">

@@ -27,7 +27,7 @@ final readonly class ActivationController
         $user = $request->user();
 
         if ($user->twoFactorSecret()) {
-            return redirect()->route('two-factor-confirmation::create');
+            return redirect()->route('two-factor::confirmation.create');
         }
 
         return view('two-factor::activation.create');
@@ -45,7 +45,7 @@ final readonly class ActivationController
         );
 
         return redirect()
-            ->route('two-factor-confirmation::create')
+            ->route('two-factor::confirmation.create')
             ->with('status', trans('two-factor::messages.activation.secret-generated'));
     }
 
@@ -55,7 +55,7 @@ final readonly class ActivationController
         $user = $request->user();
 
         if ( ! $user->hasEnabledTwoFactorAuthentication()) {
-            return redirect()->route('two-factor-confirmation::create');
+            return redirect()->route('two-factor::confirmation.create');
         }
 
         return view('two-factor::activation.show');
@@ -72,7 +72,7 @@ final readonly class ActivationController
         );
 
         return redirect()
-            ->route('two-factor-activation::create')
+            ->route('two-factor::activation.create')
             ->with('status', trans('two-factor::messages.activation.disabled'));
     }
 }

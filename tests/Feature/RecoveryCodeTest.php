@@ -23,7 +23,7 @@ test('users can authenticate using one the correct two factor recovery code', fu
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('login'))->post(route('two-factor-authentication::store', [
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
         'recovery_code' => 'one',
     ]));
 
@@ -51,7 +51,7 @@ test('users can not authenticate using the wrong two factor recovery code', func
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('login'))->post(route('two-factor-authentication::store', [
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
         'recovery_code' => 'wrong-recovery-code',
     ]));
 

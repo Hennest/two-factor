@@ -16,7 +16,7 @@ test('two factor login page is rendered', function (): void {
     Session::put('2fa:user:id', $user->id);
 
     $response = get(
-        route('two-factor-authentication::create')
+        route('two-factor::authentication.create')
     );
 
     assertGuest();
@@ -26,7 +26,7 @@ test('two factor login page is rendered', function (): void {
 
 test('two factor login page is not rendered if session does not have valid key', function (): void {
     $response = from(route('login'))->get(
-        route('two-factor-authentication::create')
+        route('two-factor::authentication.create')
     );
 
     expect(Session::get('2fa:user:id'))->toBeNull();
@@ -49,7 +49,7 @@ test('users can authenticate using the correct two factor authentication code', 
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('two-factor-authentication::create'))->post(route('two-factor-authentication::store', [
+    $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store', [
         'code' => $validOtp,
     ]));
 
@@ -69,7 +69,7 @@ test('users cannot authenticate using wrong two factor authentication code', fun
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('login'))->post(route('two-factor-authentication::store', [
+    $response = from(route('login'))->post(route('two-factor::authentication.store', [
         'code' => 'invalid-otp',
     ]));
 
@@ -94,14 +94,14 @@ test('two factor authentication fails for old otp', function (): void {
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('two-factor-authentication::create'))->post(route('two-factor-authentication::store', [
+    $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store', [
         'code' => $previousOtp,
     ]));
 
     $response
         ->assertSessionHasErrors(['code'])
         ->assertSessionHas('2fa:user:id', $user->id)
-        ->assertRedirect(route('two-factor-authentication::create'));
+        ->assertRedirect(route('two-factor::authentication.create'));
 });
 
 test('two factor authentication fails for old otp regardless of what is set for window', function (): void {
@@ -121,14 +121,14 @@ test('two factor authentication fails for old otp regardless of what is set for 
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('two-factor-authentication::create'))->post(route('two-factor-authentication::store', [
+    $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store', [
         'code' => $previousOtp,
     ]));
 
     $response
         ->assertSessionHasErrors(['code'])
         ->assertSessionHas('2fa:user:id', $user->id)
-        ->assertRedirect(route('two-factor-authentication::create'));
+        ->assertRedirect(route('two-factor::authentication.create'));
 });
 
 test('two factor authentication fails for zero window', function (): void {
@@ -147,14 +147,14 @@ test('two factor authentication fails for zero window', function (): void {
 
     Session::put('2fa:user:id', $user->id);
 
-    $response = from(route('two-factor-authentication::create'))->post(route('two-factor-authentication::store', [
+    $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store', [
         'code' => $previousOtp,
     ]));
 
     $response
         ->assertSessionHasErrors(['code'])
         ->assertSessionHas('2fa:user:id', $user->id)
-        ->assertRedirect(route('two-factor-authentication::create'));
+        ->assertRedirect(route('two-factor::authentication.create'));
 });
 
 test('ensure two factor authentication attempts are throttled', function (): void {
@@ -165,7 +165,7 @@ test('ensure two factor authentication attempts are throttled', function (): voi
     Session::put('2fa:user:id', $user->id);
 
     for ($i = 0; $i < 7; $i++) {
-        $response = from(route('two-factor-authentication::create'))->post(route('two-factor-authentication::store'), [
+        $response = from(route('two-factor::authentication.create'))->post(route('two-factor::authentication.store'), [
             'code' => 'invalid-otp',
         ]);
     }

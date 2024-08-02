@@ -30,11 +30,11 @@ final readonly class ConfirmationController
         $user = $request->user();
 
         if ( ! $user->twoFactorSecret()) {
-            return redirect()->route('two-factor-activation::create');
+            return redirect()->route('two-factor::activation.create');
         }
 
         if ($user->hasEnabledTwoFactorAuthentication()) {
-            return redirect()->route('two-factor-activation::show');
+            return redirect()->route('two-factor::activation.show');
         }
 
         return view('two-factor::confirmation.create', [
@@ -61,7 +61,7 @@ final readonly class ConfirmationController
         }
 
         return redirect()
-            ->route('two-factor-activation::show')
+            ->route('two-factor::activation.show')
             ->with('status', trans('two-factor::messages.activation.enabled'));
     }
 }

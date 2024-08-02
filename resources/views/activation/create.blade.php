@@ -10,7 +10,7 @@
             </p>
             <x-two-factor::session-status :status="session('status')" />
 
-            <form method="POST" action="{{ route('two-factor-activation::store') }}">
+            <form method="POST" action="{{ route('two-factor::activation.store') }}">
                 @csrf
 
                 <div class="form-group row">

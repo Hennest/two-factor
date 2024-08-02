@@ -36,7 +36,7 @@ final class RedirectIfTwoFactorAuthenticatable
                 '2fa:user:remember' => $request->boolean('remember'),
             ]);
 
-            return redirect()->route('two-factor-authentication::create');
+            return redirect()->route('two-factor::authentication.create');
         }
 
         return $next($request);

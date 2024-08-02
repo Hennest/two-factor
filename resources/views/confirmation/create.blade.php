@@ -16,7 +16,7 @@
                 {{ __('Alternatively, you can use the code: :secretKey', ['secretKey' => $secretKey]) }}
             </p>
 
-            <form method="POST" action="{{ route('two-factor-confirmation::store') }}">
+            <form method="POST" action="{{ route('two-factor::confirmation.store') }}">
                 @csrf
 
                 <div class="form-group row">
