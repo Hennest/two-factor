@@ -6,8 +6,8 @@ namespace Hennest\TwoFactor\Services;
 
 use Hennest\TwoFactor\Contracts\RecoveryCodeInterface;
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
-use Hennest\TwoFactor\Contracts\TwoFactorInterface;
-use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatorInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorManagerInterface;
 use Illuminate\Database\Eloquent\Model;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
@@ -15,10 +15,10 @@ use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use Psr\SimpleCache\InvalidArgumentException;
 use Random\RandomException;
 
-final readonly class TwoFactorService implements TwoFactorServiceInterface
+final readonly class TwoFactorManager implements TwoFactorManagerInterface
 {
     public function __construct(
-        private TwoFactorInterface $twoFactor,
+        private TwoFactorAuthenticatorInterface $twoFactor,
         private RecoveryCodeInterface $recoveryCode,
     ) {
     }
@@ -67,11 +67,7 @@ final readonly class TwoFactorService implements TwoFactorServiceInterface
      */
     public function confirmTwoFactor(TwoFactorAuthenticatable $user, string $code): bool
     {
-        if ( ! $user->twoFactorSecret()) {
-            return false;
-        }
-
-        if ( ! $this->validateSecretKey($user, $code)) {
+        if ( ! $user->twoFactorSecret() || ! $this->validateSecretKey($user, $code)) {
             return false;
         }
 

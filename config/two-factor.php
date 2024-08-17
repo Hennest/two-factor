@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 return [
     /**
+     * Two-factor authentication recovery codes configuration.
+     */
+    'recovery_codes' => [
+        /**
+         * Number of recovery codes to generate.
+         */
+        'number_of_codes' => 8,
+    ],
+
+    /**
      * Two-factor authentication guest configuration.
      */
     'guest' => [
@@ -26,10 +36,11 @@ return [
          * Two-factor authentication model.
          */
         'model' => App\Models\User::class,
+
         /**
          * Two-factor authentication window.
          */
-        //        'window' => 0,
+        'window' => 1,
 
         /**
          * Old OTP is forbidden when set to true regardless of the window.

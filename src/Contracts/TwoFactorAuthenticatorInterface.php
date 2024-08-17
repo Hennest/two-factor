@@ -9,7 +9,7 @@ use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use Psr\SimpleCache\InvalidArgumentException;
 
-interface TwoFactorInterface
+interface TwoFactorAuthenticatorInterface
 {
     /**
      * @throws IncompatibleWithGoogleAuthenticatorException

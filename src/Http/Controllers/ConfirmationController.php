@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Hennest\TwoFactor\Http\Controllers;
 
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
-use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorManagerInterface;
 use Hennest\TwoFactor\Http\Requests\ConfirmationRequest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +20,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 final readonly class ConfirmationController
 {
     public function __construct(
-        private TwoFactorServiceInterface $twoFactorService,
+        private TwoFactorManagerInterface $twoFactorService,
     ) {
     }
 

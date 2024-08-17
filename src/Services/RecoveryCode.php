@@ -7,9 +7,14 @@ namespace Hennest\TwoFactor\Services;
 use Hennest\TwoFactor\Contracts\RecoveryCodeInterface;
 use Random\RandomException;
 
-final class RecoveryCode implements RecoveryCodeInterface
+final readonly class RecoveryCode implements RecoveryCodeInterface
 {
     private const NUMBER_OF_TIMES_TO_GENERATE = 8;
+
+    public function __construct(
+        private int|null $numCodes
+    ) {
+    }
 
     /**
      * @throws RandomException
@@ -28,11 +33,11 @@ final class RecoveryCode implements RecoveryCodeInterface
      * @return array<array-key, string>
      * @throws RandomException
      */
-    public function generateCodes(): array
+    public function generateCodes(int|null $numCodes = 8): array
     {
         $codes = [];
 
-        for ($i = 0; $i < self::NUMBER_OF_TIMES_TO_GENERATE; $i++) {
+        for ($i = 0; $i < $this->numCodes ?? $numCodes; $i++) {
             $codes[] = $this->generate();
         }
 

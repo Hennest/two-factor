@@ -9,7 +9,7 @@ use Hennest\QrCode\Exceptions\InvalidMarginException;
 use Hennest\QrCode\Exceptions\InvalidSizeException;
 use Hennest\QRCode\Services\QRCodeInterface;
 use Hennest\TwoFactor\Contracts\RecoveryCodeInterface;
-use Hennest\TwoFactor\Contracts\TwoFactorInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatorInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Random\RandomException;
@@ -90,7 +90,7 @@ trait HasTwoFactorAuthentication
             return null;
         }
 
-        return app(TwoFactorInterface::class)->qrCodeUrl(
+        return app(TwoFactorAuthenticatorInterface::class)->qrCodeUrl(
             companyName: parse_url(config('app.url'), PHP_URL_HOST),
             companyEmail: $this->getAuthIdentifierUsername(),
             secret: $this->twoFactorSecret()

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Hennest\TwoFactor\Http\Controllers;
 
 use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatable;
-use Hennest\TwoFactor\Contracts\TwoFactorServiceInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorManagerInterface;
 use Hennest\TwoFactor\Http\Requests\EnableRequest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +17,7 @@ use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 final readonly class ActivationController
 {
     public function __construct(
-        private TwoFactorServiceInterface $twoFactorService,
+        private TwoFactorManagerInterface $twoFactorService,
     ) {
     }
 

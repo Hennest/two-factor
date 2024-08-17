@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Hennest\TwoFactor\Services;
 
-use Hennest\TwoFactor\Contracts\TwoFactorInterface;
+use Hennest\TwoFactor\Contracts\TwoFactorAuthenticatorInterface;
 use Illuminate\Contracts\Cache\Repository;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
@@ -12,13 +12,15 @@ use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use PragmaRX\Google2FA\Google2FA;
 use Psr\SimpleCache\InvalidArgumentException;
 
-final readonly class TwoFactor implements TwoFactorInterface
+final readonly class TwoFactorAuthenticator implements TwoFactorAuthenticatorInterface
 {
     private const FORBID_OLD_OTP = 0;
 
     public function __construct(
         private Google2FA $engine,
         private Repository $cache,
+        private int $window,
+        private bool $forbidOldOtp
     ) {
     }
 
@@ -49,9 +51,9 @@ final readonly class TwoFactor implements TwoFactorInterface
      */
     public function verify(string $secret, string $oneTimeCode, int|null $oldTimeStamp = null): bool
     {
-        $window = config('two-factor.auth.forbid_old_otp')
+        $window = $this->forbidOldOtp
             ? self::FORBID_OLD_OTP
-            : config('two-factor.auth.window');
+            : $this->window;
 
         if (is_int($window)) {
             $this->engine->setWindow($window);
